@@ -1,27 +1,43 @@
 export const sampleAi = {
-  name: "Give Me A Name", // a cute name
-  icon: "-", // an image link
+  name: "MindBender",
   getNextCard: (hand, targets, opponentPlays) => {
-    let nextTarget = targets[targets.length - 1]; // this is the card we are playing for
-    // implement a strategy -- here's one for example (delete this and replace with your own)
+    const nextTarget = targets[targets.length - 1];
+    
+    // Define royals
+    const royals = hand.filter(card => card > 10);
 
-    if (Math.random() > 0.5) {
-      // flip a coin...
-      // 50% chance to play a random card
-      let cardIndex = Math.floor(Math.random() * hand.length);
-      return hand[cardIndex]; // play a random card
-    } else {
-      // otherwise, just play the target if we can...
-      if (hand.includes(nextTarget)) {
-        // If I can, play it!
-        return nextTarget;
-      } else if (hand.includes(nextTarget + 1)) {
-        // If I can't, play the next card up
-        return nextTarget + 1;
-      } else {
-        // If I can't, play the lowest card
-        return Math.min(...hand); // play the lowest card in hand
+    // MindBender twists logic to stay unpredictable but intentional
+
+    // If target is high, act low to bait
+    if (nextTarget >= 10) {
+      const lowOptions = hand.filter(c => c <= 5);
+      if (lowOptions.length > 0) {
+        return Math.max(...lowOptions); // best bait
+      }
+      if (royals.length > 0) {
+        return Math.min(...royals); // pretend to burn a weak royal
       }
     }
-  },
+
+    // If target is mid (6–9), play chaos — shuffle psychological pressure
+    if (nextTarget >= 6 && nextTarget < 10) {
+      const near = hand.filter(c => Math.abs(c - nextTarget) <= 2);
+      if (near.length > 0) {
+        return near[Math.floor(Math.random() * near.length)];
+      }
+      return hand[Math.floor(Math.random() * hand.length)];
+    }
+
+    // If target is low, overpower it subtly
+    if (nextTarget < 6) {
+      const overplay = hand.filter(c => c > nextTarget);
+      if (overplay.length > 0) {
+        return Math.min(...overplay); // pressure softly
+      }
+      return Math.min(...hand); // fallback
+    }
+
+    // Final fallback
+    return hand[Math.floor(Math.random() * hand.length)];
+  }
 };
